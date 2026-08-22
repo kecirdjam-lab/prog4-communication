@@ -1,2 +1,1318 @@
 # prog4-communication
 نظام التبليغات - المقاطعة 10 سطيف
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>نظام التبليغات الموحد - المقاطعة 10 سطيف</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Segoe UI", Tahoma, Arial; background: #f0f2f5; padding: 20px; font-size: 16px; }
+.container { max-width: 1400px; margin: auto; background: #fff; padding: 25px; border-radius: 10px; }
+h1 { color: #0a3d62; text-align: center; margin-bottom: 20px; font-size: 28px; }
+h2 { font-size: 22px; color: #0a3d62; }
+.tabs { display: flex; gap: 3px; margin-bottom: 20px; border-bottom: 2px solid #0a3d62; flex-wrap: wrap; }
+.tab { padding: 10px 14px; cursor: pointer; background: #eef; border-radius: 5px 5px 0 0; font-size: 14px; }
+.tab.active { background: #0a3d62; color: #fff; }
+.panel { display: none; }
+.panel.active { display: block; }
+.btn { padding: 10px 16px; border: none; border-radius: 5px; cursor: pointer; margin: 3px; font-size: 14px; }
+.btn-primary { background: #0a3d62; color: #fff; }
+.btn-success { background: #27ae60; color: #fff; }
+.btn-warning { background: #d35400; color: #fff; }
+.btn-danger { background: #c0392b; color: #fff; }
+.btn-info { background: #2980b9; color: #fff; }
+.btn:hover { opacity: .9; }
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; }
+.form-group textarea { min-height: 70px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.section { background: #f8f9fa; padding: 12px; border-right: 4px solid #0a3d62; margin: 15px 0 10px; font-weight: bold; color: #0a3d62; font-size: 16px; }
+.alert { padding: 12px; border-radius: 5px; margin: 10px 0; background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; font-size: 15px; }
+.alert.urgent { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+th, td { padding: 10px; border: 1px solid #ddd; text-align: right; }
+th { background: #0a3d62; color: #fff; }
+tr:nth-child(even) { background: #f9f9f9; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.badge.urgent { background: #dc3545; color: #fff; }
+.badge.help { background: #ffc107; color: #000; }
+.badge.stop { background: #fd7e14; color: #fff; }
+.badge.violence { background: #6f42c1; color: #fff; }
+.badge.destruction { background: #e83e8c; color: #fff; }
+.badge.rebellion { background: #343a40; color: #fff; }
+.badge.force { background: #20c997; color: #fff; }
+.badge.positive { background: #28a745; color: #fff; }
+.badge.visit { background: #17a2b8; color: #fff; }
+.badge.other { background: #6c757d; color: #fff; }
+
+.official-doc .doc-header { text-align: center; border-bottom: 4px double #0a3d62; padding-bottom: 15px; margin-bottom: 25px; }
+.official-doc .doc-header h3 { margin: 6px 0; font-size: 17pt; color: #0a3d62; font-weight: bold; }
+.header-row-flex { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 15pt; color: #0a3d62; font-weight: bold; }
+.header-row-flex .right-side { text-align: right; flex: 1; }
+.header-row-flex .left-side { text-align: left; flex: 1; }
+.title-row-flex { display: flex; justify-content: space-between; align-items: center; margin: 15px 0 10px; }
+.title-row-flex .title-center { flex: 2; text-align: center; }
+.title-row-flex .title-center h2 { font-size: 20pt; color: #0a3d62; font-weight: bold; text-decoration: underline; margin: 0; }
+.title-row-flex .title-left { flex: 1; text-align: left; font-size: 13pt; color: #333; font-weight: bold; }
+.official-doc { border: 3px solid #0a3d62; padding: 40px 45px; font-family: "Traditional Arabic", "Amiri", "Times New Roman", serif; background: #fff; color: #000; font-size: 15pt; line-height: 2; }
+.official-doc .doc-section { margin: 20px 0; }
+.official-doc .doc-section h4 { font-size: 16pt; color: #0a3d62; font-weight: bold; border-bottom: 2px solid #0a3d62; padding-bottom: 5px; margin-bottom: 12px; margin-top: 18px; }
+.official-doc .doc-section p { font-size: 14pt; margin: 6px 0; line-height: 2; }
+.official-doc table.doc-table { width: 100%; border: 2px solid #0a3d62; margin: 12px 0; border-collapse: collapse; }
+.official-doc table.doc-table th, .official-doc table.doc-table td { border: 1px solid #0a3d62; padding: 10px; text-align: center; font-size: 13pt; }
+.official-doc table.doc-table th { background: #e8f0fe; color: #0a3d62; font-size: 14pt; }
+.official-doc .doc-footer { margin-top: 40px; text-align: left; font-size: 14pt; font-weight: bold; border-top: 2px solid #0a3d62; padding-top: 15px; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; padding: 0; }
+  .container { box-shadow: none; padding: 0; max-width: 100%; }
+  .panel { display: block !important; }
+  .panel:not(.print-target) { display: none !important; }
+  .panel.print-target { display: block !important; }
+}
+</style>
+<!-- ✅ مكتبة EmailJS لإرسال البريد الإلكتروني -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script type="text/javascript">
+  // ✅ استبدل هذه القيم بقيمك الحقيقية من EmailJS
+  (function() {
+    emailjs.init({
+      publicKey: "ضع_هنا_Public_Key_الخاص_بك"
+    });
+  })();
+  // ===== ✅ دوال إرسال البريد الإلكتروني عبر EmailJS =====
+
+// ⚠️ استبدل هذه القيم بقيمك الحقيقية من EmailJS
+const EMAIL_CONFIG = {
+  serviceId: "ضع_هنا_Service_ID",      // من Email Services
+  templateId: "ضع_هنا_Template_ID",    // من Email Templates
+  publicKey: "ضع_هنا_Public_Key",       // من Account > API Keys
+  toEmail: "kecirdjam@gmail.com"   // بريدك الذي سيستقبل التبليغات
+};
+
+// فتح نافذة الإرسال
+function sendByEmail() {
+  // التحقق من ملء الحقول الأساسية
+  const institution = document.getElementById('r_institution').value.trim();
+  const type = document.getElementById('r_type').value;
+  const subject = document.getElementById('r_subject').value.trim();
+  
+  if (!institution || !type || !subject) {
+    alert('⚠️ يرجى ملء الحقول الإلزامية (اسم المؤسسة، نوع الواقعة، الموضوع) قبل الإرسال');
+    return;
+  }
+  
+  // عرض النافذة
+  document.getElementById('emailModal').style.display = 'flex';
+}
+
+// إغلاق النافذة
+function closeEmailModal() {
+  document.getElementById('emailModal').style.display = 'none';
+}
+
+// تأكيد الإرسال
+function confirmSendEmail() {
+  const senderName = document.getElementById('email_sender_name').value.trim();
+  const senderEmail = document.getElementById('email_sender_address').value.trim();
+  
+  if (!senderName || !senderEmail) {
+    alert('⚠️ يرجى ملء اسم المرسل وبريده الإلكتروني');
+    return;
+  }
+  
+  // التحقق من صحة البريد
+  if (!senderEmail.includes('@') || !senderEmail.includes('.')) {
+    alert('⚠️ البريد الإلكتروني غير صحيح');
+    return;
+  }
+  
+  // جمع بيانات التبليغ
+  const report = {
+    id: uid(),
+    institution: document.getElementById('r_institution').value.trim(),
+    sender: document.getElementById('r_sender').value,
+    date: document.getElementById('r_date').value,
+    time: document.getElementById('r_time').value,
+    type: document.getElementById('r_type').value,
+    priority: document.getElementById('r_priority').value,
+    subject: document.getElementById('r_subject').value.trim(),
+    description: document.getElementById('r_description').value.trim(),
+    people: document.getElementById('r_people').value,
+    results: document.getElementById('r_results').value,
+    actions: document.getElementById('r_actions').value,
+    request: document.getElementById('r_request').value,
+    notes: document.getElementById('r_notes').value,
+    sentAt: new Date().toISOString(),
+    senderEmail: senderEmail,
+    senderName: senderName
+  };
+  
+  // إظهار رسالة "جاري الإرسال..."
+  const sendBtn = event.target;
+  sendBtn.disabled = true;
+  sendBtn.textContent = '⏳ جاري الإرسال...';
+  
+  // إرسال البريد عبر EmailJS
+  const templateParams = {
+    from_name: senderName,
+    from_email: senderEmail,
+    to_email: EMAIL_CONFIG.toEmail,
+    institution: report.institution,
+    type: report.type,
+    date: report.date,
+    subject: report.subject,
+    description: report.description,
+    priority: report.priority,
+    people: report.people,
+    actions: report.actions,
+    request: report.request,
+    // الملف JSON كسلسلة نصية
+    report_json: JSON.stringify(report, null, 2)
+  };
+  
+  emailjs.send(EMAIL_CONFIG.serviceId, EMAIL_CONFIG.templateId, templateParams)
+    .then(function(response) {
+      console.log('✅ تم الإرسال بنجاح!', response);
+      
+      // حفظ التبليغ محلياً
+      DB.reports.push(report);
+      save();
+      
+      // رسالة نجاح
+      alert('✅ تم إرسال التبليغ بنجاح إلى بريد المفتش!\n\nسيتم استلامه خلال دقائق.');
+      
+      // إغلاق النافذة ومسح النموذج
+      closeEmailModal();
+      clearForm();
+      
+      // إعادة الزر لحالته الطبيعية
+      sendBtn.disabled = false;
+      sendBtn.textContent = '📤 إرسال الآن';
+    })
+    .catch(function(error) {
+      console.error('❌ خطأ في الإرسال:', error);
+      alert('❌ حدث خطأ أثناء الإرسال:\n' + (error.text || error.message) + '\n\nيرجى المحاولة مرة أخرى أو استخدام "حفظ وتصدير JSON" كبديل.');
+      
+      sendBtn.disabled = false;
+      sendBtn.textContent = '📤 إرسال الآن';
+    });
+}
+</script>
+</head>
+<body>
+<div class="container">
+<h1>🛡️ نظام التبليغات والتواصل المؤسسي - المقاطعة 10 - سطيف</h1>
+
+<div class="tabs no-print">
+<div class="tab active" onclick="showTab('mode')">🔄 اختيار الوضع</div>
+<div class="tab" onclick="showTab('inspector')">‍💼 لوحة المفتش</div>
+<div class="tab" onclick="showTab('report')">📝 تبليغ جديد</div>
+<div class="tab" onclick="showTab('daily')">📅 التقرير اليومي</div>
+<div class="tab" onclick="showTab('weekly')">📆 التقرير الأسبوعي</div>
+<div class="tab" onclick="showTab('monthly')">📊 التقرير الشهري</div>
+<div class="tab" onclick="showTab('annual')">📈 التقرير السنوي</div>
+<div class="tab" onclick="showTab('archive')">🗄️ الأرشيف</div>
+</div>
+
+<!-- اختيار الوضع -->
+<div class="panel active" id="mode">
+<h2>🔄 اختر وضع العمل</h2>
+<div class="form-row">
+<div class="form-group" style="background:#e8f0fe;padding:20px;border-radius:8px;cursor:pointer;" onclick="setMode('inspector')">
+<h3 style="color:#0a3d62;">👨‍💼 وضع المفتش (الخادم الرئيسي)</h3>
+<p>استقبال التبليغات، توليد التقارير، الإحصائيات</p>
+</div>
+<div class="form-group" style="background:#d4edda;padding:20px;border-radius:8px;cursor:pointer;" onclick="setMode('institution')">
+<h3 style="color:#155724;">🏫 وضع المؤسسة (الملحق)</h3>
+<p>إرسال تبليغات، طلبات، إيجابيات</p>
+</div>
+</div>
+</div>
+
+<!-- لوحة المفتش -->
+<div class="panel" id="inspector">
+<h2>👨‍💼 لوحة المفتش - الخادم الرئيسي</h2>
+
+<div class="no-print">
+<div class="section">📥 استيراد البيانات</div>
+<div class="form-row">
+<div class="form-group">
+<label>📥 استيراد تبليغ من مؤسسة (JSON)</label>
+<input type="file" id="importReport" accept=".json" onchange="importReport(event)">
+</div>
+<div class="form-group">
+<label>🏫 استيراد المؤسسات (JSON - البرنامج 1)</label>
+<input type="file" id="importInstJSON" accept=".json" onchange="importInstJSON(event)">
+</div>
+<div class="form-group">
+<label>👥 استيراد الموظفين (JSON - البرنامج 1)</label>
+<input type="file" id="importEmpJSON" accept=".json" onchange="importEmpJSON(event)">
+</div>
+<div class="form-group">
+<label>🏫 استيراد المؤسسات (CSV - الأرضية الرقمية)</label>
+<input type="file" id="importInstCSV" accept=".csv" onchange="importInstCSV(event)">
+</div>
+<div class="form-group">
+<label>👥 استيراد الموظفين (CSV - الأرضية الرقمية)</label>
+<input type="file" id="importEmpCSV" accept=".csv" onchange="importEmpCSV(event)">
+</div>
+<div class="form-group">
+<label>📤 تصدير كل التبليغات</label>
+<button class="btn btn-primary" onclick="exportAllReports()">تصدير JSON</button>
+</div>
+</div>
+
+<div class="section">🔍 التحقق من البيانات</div>
+<button class="btn btn-info" onclick="checkImportedData()" style="font-size:15px;padding:12px 20px;">🔍 عرض البيانات المستوردة</button>
+<button class="btn btn-danger" onclick="clearAllData()" style="font-size:15px;padding:12px 20px;">🗑️ مسح جميع البيانات</button>
+</div>
+
+<div class="section">📊 إحصائيات عامة</div>
+<div id="stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:10px;"></div>
+
+<div class="section">🔔 آخر التبليغات الواردة</div>
+<div id="recentReports"></div>
+
+<div class="section">📋 جميع التبليغات</div>
+<div class="no-print" style="margin-bottom:10px;">
+<input type="text" id="searchReports" placeholder="🔍 بحث..." oninput="filterReports()" style="padding:10px;border:2px solid #0a3d62;border-radius:5px;width:100%;font-size:15px;">
+<select id="filterType" onchange="filterReports()" style="padding:10px;border:2px solid #0a3d62;border-radius:5px;font-size:15px;">
+<option value="">كل الأنواع</option>
+<option value="طلب مساعدة">🆘 طلب مساعدة</option>
+<option value="توقف/احتجاج">⛔ توقف/احتجاج</option>
+<option value="عنف">⚔️ عنف</option>
+<option value="تخريب">💥 تخريب</option>
+<option value="تمرد">😤 تمرد</option>
+<option value="قوة قاهرة">🌊 قوة قاهرة</option>
+<option value="دعوة">📨 دعوة</option>
+<option value="زيارة تفتيش">🔍 زيارة تفتيش</option>
+<option value="أخرى">📌 أخرى</option>
+</select>
+</div>
+<table id="allReportsTable">
+<thead><tr><th>#</th><th>التاريخ</th><th>المؤسسة</th><th>نوع الواقعة</th><th>الموضوع</th><th>درجة التدخل</th><th>إجراء</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+
+<!-- تبليغ جديد -->
+<div class="panel" id="report">
+<h2>📝 تبليغ / طلب / إيجابية جديدة</h2>
+<div class="alert"><b>💡 املأ البيانات ثم اضغط "💾 حفظ وتصدير" لإنشاء ملف JSON ترسله للمفتش.</b></div>
+<button class="btn btn-info" onclick="sendByEmail()">📧 إرسال بالبريد</button>
+<div class="form-row">
+  <div class="form-group">
+    <label>🏫 اسم المؤسسة *</label>
+    <!-- ✅ datalist يسمح بالكتابة أو الاختيار من القائمة -->
+    <input type="text" id="r_institution" list="inst_datalist" placeholder="اكتب حرفاً للبحث أو اختر من القائمة">
+    <datalist id="inst_datalist"></datalist>
+	<!-- ✅ نافذة إرسال البريد الإلكتروني -->
+<div id="emailModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:1000; justify-content:center; align-items:center; padding:20px;">
+  <div style="background:#fff; border-radius:10px; padding:25px; max-width:500px; width:100%;">
+    <h2 style="color:#0a3d62; border-bottom:2px solid #0a3d62; padding-bottom:10px; margin-bottom:15px;">📧 إرسال التبليغ بالبريد</h2>
+    
+    <div class="form-group">
+      <label>اسم المرسل (المدير/المسؤول) *</label>
+      <input type="text" id="email_sender_name" placeholder="مثال: ذيب لزهر">
+    </div>
+    
+    <div class="form-group">
+      <label>بريدك الإلكتروني *</label>
+      <input type="email" id="email_sender_address" placeholder="مثال: director@school.edu.dz">
+    </div>
+    
+    <div class="alert" style="background:#fff3cd; color:#856404;">
+      <b>💡 ملاحظة:</b> سيتم إرسال ملف JSON يحتوي على تفاصيل التبليغ إلى بريد المفتش.
+    </div>
+    
+    <div style="margin-top:15px; display:flex; gap:10px;">
+      <button class="btn btn-success" onclick="confirmSendEmail()">📤 إرسال الآن</button>
+      <button class="btn btn-danger" onclick="closeEmailModal()">❌ إلغاء</button>
+    </div>
+  </div>
+</div>
+  </div>
+  <div class="form-group">
+    <label>👤 اسم المبلّغ (المدير/المسؤول) *</label>
+    <!-- ✅ select قائمة منسدلة من جدول الموظفين -->
+    <select id="r_sender">
+      <option value="">-- اختر من جدول الموظفين --</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>📅 التاريخ *</label>
+    <input type="date" id="r_date">
+  </div>
+  <div class="form-group">
+    <label>⏰ الوقت</label>
+    <input type="time" id="r_time">
+  </div>
+</div>
+
+<div class="form-row">
+<div class="form-group">
+<label>📂 نوع التبليغ *</label>
+<select id="r_type" onchange="updatePriority()">
+<option value="">-- اختر --</option>
+<optgroup label="سلبيات/طوارئ">
+<option value="طلب مساعدة">🆘 واقعة نطلب لها المساعدة</option>
+<option value="توقف/احتجاج">✋ توقف مفاجئ عن العمل / احتجاج</option>
+<option value="عنف">⚔️ حادثة عنف (جسدي/لفظي)</option>
+<option value="تخريب">💥 تخريب أو إتلاف جماعي</option>
+<option value="تمرد">😤 تمرد جماعي أو فردي</option>
+<option value="قوة قاهرة">🌊 قوة قاهرة منعت الدراسة</option>
+</optgroup>
+<optgroup label="دعوات">
+<option value="دعوة">📨 دعوة لحضور فعالية/تظاهرة</option>
+<option value="دعوة محاضرة">🎓 دعوة لتقديم/حضور محاضرة</option>
+<option value="دعوة حفل">🏆 دعوة لحضور حفل توزيع الجوائز</option>
+<option value="زيارة تفتيش">🔍 طلب زيارة تفتيش لموظف</option>
+</optgroup>
+<optgroup label="أخرى">
+<option value="أخرى">📌 أخرى</option>
+</optgroup>
+</select>
+</div>
+<div class="form-group">
+<label>⚡ مستوى درجة التدخل</label>
+<select id="r_priority">
+<option value="عادي">🟢 عادي</option>
+<option value="مستعجل">🟡 مستعجل</option>
+<option value="ضروري">🔴 ضروري</option>
+</select>
+</div>
+</div>
+
+<div class="form-group">
+<label>📌 الموضوع / العنوان *</label>
+<input type="text" id="r_subject" placeholder="مثال: حادثة عنف بين تلميذين في الساحة">
+</div>
+
+<div class="form-group">
+<label>📝 وصف تفصيلي للحدث *</label>
+<textarea id="r_description" rows="5" placeholder="اشرح ما حدث بالتفصيل..."></textarea>
+</div>
+
+<div class="form-row">
+  <div class="form-group">
+    <label>👥 أشخاص الحدث أو الواقعة</label>
+    <input type="text" id="r_people" placeholder="أسماء التلاميذ/الموظفين المعنيين">
+  </div>
+  <div class="form-group">
+    <label>📌 نتائج الحادثة أو أهداف الدعوة</label>
+    <input type="text" id="r_results" placeholder="أهم النتائج">
+  </div>
+  <div class="form-group">
+    <label>🔧 الإجراءات المتخذة / التحضيرات</label>
+    <textarea id="r_actions" rows="3" placeholder="ما الإجراءات التي اتخذتها المؤسسة؟"></textarea>
+  </div>
+</div>
+
+<div class="form-row">
+<div class="form-group">
+<label>🎯 المطلوب من المفتش</label>
+<textarea id="r_request" rows="3" placeholder="مثال: نرجو التدخل العاجل..."></textarea>
+</div>
+<div class="form-group">
+<label>📝 ملاحظات إضافية</label>
+<textarea id="r_notes" rows="2"></textarea>
+</div>
+</div>
+
+<div class="no-print" style="margin-top:20px;">
+<button class="btn btn-success" onclick="saveAndExport()">💾 حفظ وتصدير JSON</button>
+<button class="btn btn-info" onclick="previewReport()">👁️ معاينة</button>
+<button class="btn btn-warning" onclick="clearForm()">🗑️ مسح النموذج</button>
+</div>
+<div id="previewArea" style="margin-top:20px;"></div>
+</div>
+
+<!-- التقرير اليومي -->
+<div class="panel" id="daily">
+<h2>📅 التقرير اليومي للتبليغات</h2>
+<div class="no-print">
+<div class="form-row">
+<div class="form-group"><label>📅 اختر التاريخ</label><input type="date" id="daily_date" onchange="generateDailyReport()"></div>
+<div class="form-group" style="display:flex;align-items:end;"><button class="btn btn-primary" onclick="printReport('dailyDocument')">🖨️ طباعة/PDF</button></div>
+</div>
+</div>
+<div id="dailyDocument" class="official-doc">
+<div class="doc-header">
+  <h3>الجمهورية الجزائرية الديمقراطية الشعبية</h3>
+  <h3>وزارة التربية الوطنية</h3>
+  <div class="header-row-flex"><div class="right-side">المفتشية العامة للتربية</div><div class="left-side">إدارة المتوسطات</div></div>
+  <div class="title-row-flex">
+    <div class="title-left">المقاطعة: 10 | الولاية: سطيف<br>السنة الدراسية: 2025-2026</div>
+    <div class="title-center"><h2>التقرير اليومي للتبليغات</h2></div>
+  </div>
+  <p style="margin-top:10px; font-size:14pt;">التاريخ: <span id="daily_date_display">--/--/----</span></p>
+</div>
+<div class="doc-section">
+<h4>1. إحصائيات اليوم</h4>
+<p>إجمالي التبليغات: <b><span id="daily_total">0</span></b></p>
+<p>طلبات التدخل (سلبيات): <b><span id="daily_urgent">0</span></b> | الدعوات والإيجابيات: <b><span id="daily_positive">0</span></b></p>
+</div>
+<div class="doc-section">
+<h4>2. تفاصيل التبليغات</h4>
+<table class="doc-table">
+<tr><th>#</th><th>المؤسسة</th><th>نوع الواقعة</th><th>الموضوع</th><th>درجة التدخل</th></tr>
+<tbody id="daily_table_body"></tbody>
+</table>
+</div>
+<div class="doc-section"><h4>3. الملاحظات والتوصيات</h4><p><span id="daily_notes">-</span></p></div>
+<div class="doc-footer"><p>مفتش إدارة المتوسطات - المقاطعة 10: قصير جمال</p><p>التاريخ: <span id="daily_footer_date">--/--/----</span></p></div>
+</div>
+</div>
+
+<!-- التقرير الأسبوعي -->
+<div class="panel" id="weekly">
+<h2>📆 التقرير الأسبوعي للتبليغات</h2>
+<div class="no-print">
+<div class="form-row">
+<div class="form-group"><label>📅 من تاريخ</label><input type="date" id="weekly_from" onchange="generateWeeklyReport()"></div>
+<div class="form-group"><label>📅 إلى تاريخ</label><input type="date" id="weekly_to" onchange="generateWeeklyReport()"></div>
+<div class="form-group" style="display:flex;align-items:end;"><button class="btn btn-primary" onclick="printReport('weeklyDocument')">🖨️ طباعة/PDF</button></div>
+</div>
+</div>
+<div id="weeklyDocument" class="official-doc">
+<div class="doc-header">
+  <h3>الجمهورية الجزائرية الديمقراطية الشعبية</h3>
+  <h3>وزارة التربية الوطنية</h3>
+  <div class="header-row-flex"><div class="right-side">المفتشية العامة للتربية</div><div class="left-side">إدارة المتوسطات</div></div>
+  <div class="title-row-flex">
+    <div class="title-left">المقاطعة: 10 | الولاية: سطيف<br>السنة الدراسية: 2025-2026</div>
+    <div class="title-center"><h2>التقرير الأسبوعي للتبليغات</h2></div>
+  </div>
+  <p style="margin-top:10px; font-size:14pt;">الفترة: من <span id="weekly_from_display">--/--/----</span> إلى <span id="weekly_to_display">--/--/----</span></p>
+</div>
+<div class="doc-section"><h4>1. الحصيلة العامة</h4><p>إجمالي التبليغات: <b><span id="weekly_total">0</span></b></p></div>
+<div class="doc-section"><h4>2. التوزيع حسب نوع الواقعة</h4><table class="doc-table"><tr><th>نوع التبليغ</th><th>العدد</th><th>النسبة</th></tr><tbody id="weekly_type_body"></tbody></table></div>
+<div class="doc-section"><h4>3. التوزيع حسب المؤسسات</h4><table class="doc-table"><tr><th>المؤسسة</th><th>عدد التبليغات</th><th>أبرز المواضيع</th></tr><tbody id="weekly_inst_body"></tbody></table></div>
+<div class="doc-section"><h4>4. التبليغات العاجلة والخطيرة</h4><div id="weekly_urgent_list"></div></div>
+<div class="doc-section"><h4>5. التحليل والتوصيات</h4><p><span id="weekly_analysis">-</span></p></div>
+<div class="doc-footer"><p>مفتش إدارة المتوسطات - المقاطعة 10: قصير جمال</p><p>التاريخ: <span id="weekly_footer_date">--/--/----</span></p></div>
+</div>
+</div>
+
+<!-- التقرير الشهري -->
+<div class="panel" id="monthly">
+<h2>📊 التقرير الشهري للتبليغات</h2>
+<div class="no-print">
+<div class="form-row">
+<div class="form-group"><label>📅 الشهر</label><input type="month" id="monthly_month" onchange="generateMonthlyReport()"></div>
+<div class="form-group" style="display:flex;align-items:end;"><button class="btn btn-primary" onclick="printReport('monthlyDocument')">🖨️ طباعة/PDF</button></div>
+</div>
+</div>
+<div id="monthlyDocument" class="official-doc">
+<div class="doc-header">
+  <h3>الجمهورية الجزائرية الديمقراطية الشعبية</h3>
+  <h3>وزارة التربية الوطنية</h3>
+  <div class="header-row-flex"><div class="right-side">المفتشية العامة للتربية</div><div class="left-side">إدارة المتوسطات</div></div>
+  <div class="title-row-flex">
+    <div class="title-left">المقاطعة: 10 | الولاية: سطيف<br>السنة الدراسية: 2025-2026</div>
+    <div class="title-center"><h2>التقرير الشهري للتبليغات</h2></div>
+  </div>
+  <p style="margin-top:10px; font-size:14pt;">الشهر: <span id="monthly_month_display">--</span></p>
+</div>
+<div class="doc-section"><h4>1. الإحصائيات العامة</h4><p>إجمالي التبليغات: <b><span id="monthly_total">0</span></b></p><p>متوسط التبليغات اليومية: <b><span id="monthly_avg">0</span></b></p></div>
+<div class="doc-section"><h4>2. التوزيع حسب نوع الواقعة</h4><table class="doc-table"><tr><th>نوع التبليغ</th><th>العدد</th><th>النسبة</th></tr><tbody id="monthly_type_body"></tbody></table></div>
+<!-- ✅ جديد: تفاصيل التبليغات في التقرير الشهري -->
+<div class="doc-section">
+  <h4>3. تفاصيل التبليغات الواردة هذا الشهر</h4>
+  <table class="doc-table">
+    <tr><th>#</th><th>التاريخ</th><th>المؤسسة</th><th>نوع الواقعة</th><th>الموضوع</th><th>درجة التدخل</th></tr>
+    <tbody id="monthly_details_body"></tbody>
+  </table>
+</div>
+<div class="doc-section"><h4>4. المؤسسات الأكثر تبليغاً</h4><table class="doc-table"><tr><th>المؤسسة</th><th>عدد التبليغات</th><th>طبيعة التبليغات</th></tr><tbody id="monthly_inst_body"></tbody></table></div>
+<div class="doc-section"><h4>5. تحليل الأنماط والاتجاهات</h4><p><span id="monthly_patterns">-</span></p></div>
+<div class="doc-section"><h4>6. التوصيات للمفتشية والمديرية</h4><p><span id="monthly_recommendations">-</span></p></div>
+<div class="doc-footer"><p>مفتش إدارة المتوسطات - المقاطعة 10: قصير جمال</p><p>التاريخ: <span id="monthly_footer_date">--/--/----</span></p></div>
+</div>
+</div>
+
+<!-- التقرير السنوي -->
+<div class="panel" id="annual">
+<h2>📈 التقرير السنوي للتبليغات</h2>
+<div class="no-print">
+<div class="form-row">
+<div class="form-group"><label>📅 اختر السنة</label><input type="number" id="annual_year" value="2025" min="2020" max="2030" onchange="generateAnnualReport()"></div>
+<div class="form-group" style="display:flex;align-items:end;"><button class="btn btn-primary" onclick="printReport('annualDocument')">🖨️ طباعة/PDF</button></div>
+</div>
+</div>
+<div id="annualDocument" class="official-doc">
+<div class="doc-header">
+  <h3>الجمهورية الجزائرية الديمقراطية الشعبية</h3>
+  <h3>وزارة التربية الوطنية</h3>
+  <div class="header-row-flex"><div class="right-side">المفتشية العامة للتربية</div><div class="left-side">إدارة المتوسطات</div></div>
+  <div class="title-row-flex">
+    <div class="title-left">المقاطعة: 10 | الولاية: سطيف</div>
+    <div class="title-center"><h2>التقرير السنوي للتبليغات</h2></div>
+  </div>
+  <p style="margin-top:10px; font-size:14pt;">السنة الدراسية: <span id="annual_year_display">2025</span></p>
+</div>
+<div class="doc-section"><h4>1. الإحصائيات السنوية العامة</h4><p>إجمالي التبليغات: <b><span id="annual_total">0</span></b></p><p>متوسط التبليغات الشهرية: <b><span id="annual_avg">0</span></b></p></div>
+<div class="doc-section"><h4>2. التوزيع حسب نوع الواقعة</h4><table class="doc-table"><tr><th>نوع التبليغ</th><th>العدد</th><th>النسبة</th></tr><tbody id="annual_type_body"></tbody></table></div>
+<div class="doc-section"><h4>3. تفاصيل التبليغات الهامة (عاجلة/ضرورية)</h4><table class="doc-table"><tr><th>التاريخ</th><th>المؤسسة</th><th>نوع الواقعة</th><th>الموضوع</th></tr><tbody id="annual_urgent_body"></tbody></table></div>
+<div class="doc-section"><h4>4. التحليل السنوي والتوصيات للموسم القادم</h4><p><span id="annual_analysis">-</span></p></div>
+<div class="doc-footer"><p>مفتش إدارة المتوسطات - المقاطعة 10: قصير جمال</p><p>التاريخ: <span id="annual_footer_date">--/--/----</span></p></div>
+</div>
+</div>
+
+<!-- الأرشيف -->
+<div class="panel" id="archive">
+<h2>🗄️ أرشيف التبليغات</h2>
+<div class="no-print">
+<button class="btn btn-primary" onclick="exportAllReports()">📤 تصدير كل الأرشيف (JSON)</button>
+<button class="btn btn-info" onclick="document.getElementById('importArchive').click()">📥 استيراد أرشيف</button>
+<input type="file" id="importArchive" accept=".json" style="display:none" onchange="importArchive(event)">
+<button class="btn btn-danger" onclick="clearArchive()">🗑️ مسح الأرشيف</button>
+</div>
+<div class="section">📊 إحصائيات الأرشيف</div>
+<div id="archiveStats"></div>
+</div>
+
+</div>
+
+<script>
+// ✅ الحل الجذري: قراءة البيانات القديمة بأمان، وإنشاء هيكل جديد يدمج القديم مع الجديد
+let savedData = JSON.parse(localStorage.getItem('inspector_prog4_comm')) || {};
+
+let DB = {
+  reports: savedData.reports || [],
+  institutions: savedData.institutions || [], // ✅ ضمان وجود المصفوفة
+  employees: savedData.employees || [],       // ✅ ضمان وجود المصفوفة
+  settings: savedData.settings || { inspector: 'قصير جمال', wilaya: 'سطيف', district: '10' },
+  currentMode: savedData.currentMode || 'inspector'
+};
+
+function save() { localStorage.setItem('inspector_prog4_comm', JSON.stringify(DB)); }
+function uid() { return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2,5); }
+
+function showTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  if (id === 'inspector') renderInspectorDashboard();
+  if (id === 'report') populateFormDropdowns();
+  if (id === 'daily') { document.getElementById('daily_date').value = new Date().toISOString().split('T')[0]; generateDailyReport(); }
+  if (id === 'weekly') { 
+    const today = new Date(); const weekAgo = new Date(today.getTime() - 7*24*60*60*1000);
+    document.getElementById('weekly_to').value = today.toISOString().split('T')[0];
+    document.getElementById('weekly_from').value = weekAgo.toISOString().split('T')[0];
+    generateWeeklyReport();
+  }
+  if (id === 'monthly') { document.getElementById('monthly_month').value = new Date().toISOString().slice(0,7); generateMonthlyReport(); }
+  if (id === 'annual') { document.getElementById('annual_year').value = new Date().getFullYear(); generateAnnualReport(); }
+  if (id === 'archive') renderArchive();
+}
+
+function setMode(mode) {
+  DB.currentMode = mode; save();
+  if (mode === 'inspector') { alert('✅ تم تفعيل وضع المفتش'); showTabDirect('inspector'); } 
+  else { alert('✅ تم تفعيل وضع المؤسسة'); showTabDirect('report'); }
+}
+
+function showTabDirect(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'inspector') renderInspectorDashboard();
+  if (id === 'report') populateFormDropdowns();
+}
+
+// ===== ✅ دوال استيراد JSON من البرنامج الأول (تدعم بنية rawData) =====
+function importInstJSON(e) {
+  const file = e.target.files[0]; 
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      let institutions = [];
+      
+      // ✅ دعم بنيتين مختلفتين
+      if (data.establishments && Array.isArray(data.establishments)) {
+        institutions = data.establishments;
+      } else if (Array.isArray(data)) {
+        institutions = data;
+      } else {
+        alert('❌ الملف لا يحتوي على بيانات مؤسسات صحيحة');
+        return;
+      }
+      
+      let count = 0;
+      let duplicates = 0;
+      
+      institutions.forEach(inst => {
+        // ✅ استخراج الاسم من rawData أو مباشرة
+        const name = inst.rawData?.name || inst.name || '';
+        
+        if (name && name.trim() !== '') {
+          // ✅ التحقق من عدم التكرار بالاسم
+          if (!DB.institutions.find(i => i.name === name)) {
+            DB.institutions.push({
+              id: inst.id || uid(),
+              name: name,
+              commune: inst.rawData?.commune || inst.commune || '',
+              district: inst.rawData?.district || inst.district || '',
+              director: inst.rawData?.director || inst.director || '',
+              students: inst.rawData?.students || inst.students || '',
+              classes: inst.rawData?.classes || inst.classes || '',
+              rawData: inst.rawData || inst
+            });
+            count++;
+          } else {
+            duplicates++;
+          }
+        }
+      });
+      
+      save();
+      populateFormDropdowns(); // ✅ تحديث القوائم فوراً
+      
+      let message = '✅ تم استيراد ' + count + ' مؤسسة بنجاح!';
+      if (duplicates > 0) message += '\n⚠️ تم تجاهل ' + duplicates + ' مؤسسة مكررة.';
+      message += '\n\n📊 إجمالي المؤسسات الآن: ' + DB.institutions.length;
+      alert(message);
+      
+    } catch(err) {
+      alert('❌ خطأ في قراءة الملف: ' + err.message);
+      console.error(err);
+    }
+  };
+  
+  reader.readAsText(file, 'UTF-8');
+  e.target.value = '';
+}
+
+function importEmpJSON(e) {
+  const file = e.target.files[0]; 
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      let employees = [];
+      
+      if (data.employees && Array.isArray(data.employees)) {
+        employees = data.employees;
+      } else if (Array.isArray(data)) {
+        employees = data;
+      } else {
+        alert('❌ الملف لا يحتوي على بيانات موظفين صحيحة');
+        return;
+      }
+      
+      let count = 0;
+      let duplicates = 0;
+      
+      employees.forEach(emp => {
+        // ✅ استخراج الاسم من rawData أو مباشرة
+        const fname = emp.rawData?.fname || emp.fname || '';
+        const lname = emp.rawData?.lname || emp.lname || '';
+        const name = (fname + ' ' + lname).trim();
+        
+        if (name && name !== '') {
+          if (!DB.employees.find(e => e.name === name)) {
+            DB.employees.push({
+              id: emp.id || uid(),
+              name: name,
+              rank: emp.rawData?.rank || emp.rank || '',
+              establishment: emp.rawData?.establishment || emp.establishment || '',
+              degree: emp.rawData?.degree || emp.degree || '',
+              rawData: emp.rawData || emp
+            });
+            count++;
+          } else {
+            duplicates++;
+          }
+        }
+      });
+      
+      save();
+      populateFormDropdowns(); // ✅ تحديث القوائم فوراً
+      
+      let message = '✅ تم استيراد ' + count + ' موظف بنجاح!';
+      if (duplicates > 0) message += '\n⚠️ تم تجاهل ' + duplicates + ' موظف مكرر.';
+      message += '\n\n📊 إجمالي الموظفين الآن: ' + DB.employees.length;
+      alert(message);
+      
+    } catch(err) {
+      alert('❌ خطأ في قراءة الملف: ' + err.message);
+      console.error(err);
+    }
+  };
+  
+  reader.readAsText(file, 'UTF-8');
+  e.target.value = '';
+}
+
+// ===== ✅ دوال استيراد CSV من الأرضية الرقمية =====
+function importInstCSV(e) {
+  const file = e.target.files[0]; 
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const text = ev.target.result;
+      const lines = text.split('\n').filter(line => line.trim() !== '');
+      
+      if (lines.length < 2) {
+        alert('❌ الملف فارغ أو لا يحتوي على بيانات كافية');
+        return;
+      }
+      
+      // ✅ تحديد الفاصل تلقائياً
+      const firstLine = lines[0];
+      let separator = ',';
+      if (firstLine.includes(';')) separator = ';';
+      else if (firstLine.includes('\t')) separator = '\t';
+      
+      const headers = lines[0].split(separator).map(h => h.trim().replace(/"/g, ''));
+      
+      // ✅ عرض معاينة للمستخدم لاختيار العمود الصحيح
+      let preview = '📋 معاينة الملف:\n\n';
+      preview += 'عدد الأسطر: ' + lines.length + '\n';
+      preview += 'عدد الأعمدة: ' + headers.length + '\n\n';
+      preview += 'رؤوس الأعمدة:\n';
+      headers.forEach((h, i) => {
+        preview += (i + 1) + '. ' + h + '\n';
+      });
+      
+      preview += '\n📝 أمثلة من البيانات:\n';
+      for (let i = 1; i < Math.min(4, lines.length); i++) {
+        const cols = lines[i].split(separator);
+        preview += 'سطر ' + i + ': ' + cols.slice(0, 3).join(' | ') + '\n';
+      }
+      
+      preview += '\n✅ أدخل رقم العمود الذي يحتوي على أسماء المؤسسات (1-' + headers.length + '):';
+      
+      const columnNum = prompt(preview, '1');
+      
+      if (!columnNum) {
+        alert('❌ تم إلغاء الاستيراد');
+        return;
+      }
+      
+      const columnIndex = parseInt(columnNum) - 1;
+      
+      if (columnIndex < 0 || columnIndex >= headers.length) {
+        alert('❌ رقم العمود غير صحيح');
+        return;
+      }
+      
+      let count = 0;
+      let duplicates = 0;
+      
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(separator).map(c => c.trim().replace(/"/g, ''));
+        
+        if (cols.length > columnIndex && cols[columnIndex] && cols[columnIndex].trim() !== '') {
+          const instName = cols[columnIndex].trim();
+          
+          // ✅ التحقق من عدم التكرار
+          if (!DB.institutions.find(inst => inst.name === instName)) {
+            DB.institutions.push({ 
+              id: uid(), 
+              name: instName,
+              commune: cols[1] || '',
+              district: cols[2] || '',
+              director: cols[3] || '',
+              rawData: cols
+            });
+            count++;
+          } else {
+            duplicates++;
+          }
+        }
+      }
+      
+      save();
+      populateFormDropdowns(); // ✅ تحديث القوائم فوراً
+      
+      let message = '✅ تم استيراد ' + count + ' مؤسسة بنجاح!';
+      if (duplicates > 0) message += '\n⚠️ تم تجاهل ' + duplicates + ' مؤسسة مكررة.';
+      message += '\n\n📊 إجمالي المؤسسات الآن: ' + DB.institutions.length;
+      alert(message);
+      
+    } catch(err) {
+      alert('❌ خطأ في قراءة الملف: ' + err.message);
+      console.error(err);
+    }
+  };
+  
+  reader.readAsText(file, 'UTF-8');
+  e.target.value = '';
+}
+
+function importEmpCSV(e) {
+  const file = e.target.files[0]; 
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const text = ev.target.result;
+      const lines = text.split('\n').filter(line => line.trim() !== '');
+      
+      if (lines.length < 2) {
+        alert('❌ الملف فارغ أو لا يحتوي على بيانات كافية');
+        return;
+      }
+      
+      const firstLine = lines[0];
+      let separator = ',';
+      if (firstLine.includes(';')) separator = ';';
+      else if (firstLine.includes('\t')) separator = '\t';
+      
+      const headers = lines[0].split(separator).map(h => h.trim().replace(/"/g, ''));
+      
+      let preview = '📋 معاينة الملف:\n\n';
+      preview += 'عدد الأسطر: ' + lines.length + '\n';
+      preview += 'عدد الأعمدة: ' + headers.length + '\n\n';
+      preview += 'رؤوس الأعمدة:\n';
+      headers.forEach((h, i) => {
+        preview += (i + 1) + '. ' + h + '\n';
+      });
+      
+      preview += '\n📝 أمثلة من البيانات:\n';
+      for (let i = 1; i < Math.min(4, lines.length); i++) {
+        const cols = lines[i].split(separator);
+        preview += 'سطر ' + i + ': ' + cols.slice(0, 3).join(' | ') + '\n';
+      }
+      
+      preview += '\n✅ أدخل رقم العمود الذي يحتوي على أسماء الموظفين (1-' + headers.length + '):';
+      
+      const columnNum = prompt(preview, '1');
+      
+      if (!columnNum) {
+        alert('❌ تم إلغاء الاستيراد');
+        return;
+      }
+      
+      const columnIndex = parseInt(columnNum) - 1;
+      
+      if (columnIndex < 0 || columnIndex >= headers.length) {
+        alert('❌ رقم العمود غير صحيح');
+        return;
+      }
+      
+      let count = 0;
+      let duplicates = 0;
+      
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(separator).map(c => c.trim().replace(/"/g, ''));
+        
+        if (cols.length > columnIndex && cols[columnIndex] && cols[columnIndex].trim() !== '') {
+          const empName = cols[columnIndex].trim();
+          
+          if (!DB.employees.find(emp => emp.name === empName)) {
+            DB.employees.push({ 
+              id: uid(), 
+              name: empName,
+              rawData: cols
+            });
+            count++;
+          } else {
+            duplicates++;
+          }
+        }
+      }
+      
+      save();
+      populateFormDropdowns(); // ✅ تحديث القوائم فوراً
+      
+      let message = '✅ تم استيراد ' + count + ' موظف بنجاح!';
+      if (duplicates > 0) message += '\n⚠️ تم تجاهل ' + duplicates + ' موظف مكرر.';
+      message += '\n\n📊 إجمالي الموظفين الآن: ' + DB.employees.length;
+      alert(message);
+      
+    } catch(err) {
+      alert('❌ خطأ في قراءة الملف: ' + err.message);
+      console.error(err);
+    }
+  };
+  
+  reader.readAsText(file, 'UTF-8');
+  e.target.value = '';
+}
+
+// ===== ✅ دالة تعبئة القوائم المنسدلة =====
+function populateFormDropdowns() {
+  // 1. تعبئة قائمة المؤسسات (datalist)
+  const instDatalist = document.getElementById('inst_datalist');
+  if (instDatalist) {
+    instDatalist.innerHTML = DB.institutions.map(inst => `<option value="${inst.name}">`).join('');
+  }
+  
+  // 2. تعبئة قائمة الموظفين (select)
+  const senderSelect = document.getElementById('r_sender');
+  if (senderSelect) {
+    senderSelect.innerHTML = '<option value="">-- اختر من جدول الموظفين --</option>' + 
+      DB.employees.map(emp => `<option value="${emp.name}">${emp.name} (${emp.rank || ''})</option>`).join('');
+  }
+}
+
+// ===== ✅ دالة التحقق من البيانات المستوردة =====
+function checkImportedData() {
+  let message = '📊 حالة البيانات المستوردة:\n\n';
+  message += '🏫 عدد المؤسسات: ' + DB.institutions.length + '\n';
+  message += '👥 عدد الموظفين: ' + DB.employees.length + '\n';
+  message += '📝 عدد التبليغات: ' + DB.reports.length + '\n\n';
+  
+  if (DB.institutions.length > 0) {
+    message += '📋 أول 10 مؤسسات:\n';
+    DB.institutions.slice(0, 10).forEach((inst, i) => {
+      message += (i+1) + '. ' + inst.name + ' (' + (inst.commune || '') + ')\n';
+    });
+  } else {
+    message += '⚠️ لا توجد مؤسسات مستوردة\n';
+  }
+  
+  if (DB.employees.length > 0) {
+    message += '\n👤 أول 10 موظفين:\n';
+    DB.employees.slice(0, 10).forEach((emp, i) => {
+      message += (i+1) + '. ' + emp.name + ' (' + (emp.rank || '') + ')\n';
+    });
+  } else {
+    message += '\n⚠️ لا يوجد موظفون مستوردون\n';
+  }
+  
+  alert(message);
+}
+
+function clearAllData() {
+  if (!confirm('⚠️ هل أنت متأكد من مسح جميع البيانات؟')) return;
+  if (!confirm('⚠️ تأكيد نهائي! لا يمكن التراجع.')) return;
+  DB = {
+    reports: [],
+    institutions: [],
+    employees: [],
+    settings: { inspector: 'قصير جمال', wilaya: 'سطيف', district: '10' },
+    currentMode: 'inspector'
+  };
+  save();
+  alert('✅ تم مسح جميع البيانات');
+  renderInspectorDashboard();
+}
+
+// ===== تبليغ جديد =====
+function updatePriority() {
+  const type = document.getElementById('r_type').value;
+  const priority = document.getElementById('r_priority');
+  const urgentTypes = ['عنف', 'قوة قاهرة', 'تخريب', 'تمرد'];
+  const highTypes = ['توقف/احتجاج', 'طلب مساعدة'];
+  
+  if (urgentTypes.includes(type)) priority.value = 'ضروري';
+  else if (highTypes.includes(type)) priority.value = 'مستعجل';
+  else priority.value = 'عادي';
+}
+
+function saveAndExport() {
+  const institution = document.getElementById('r_institution').value.trim();
+  const date = document.getElementById('r_date').value;
+  const type = document.getElementById('r_type').value;
+  const subject = document.getElementById('r_subject').value.trim();
+  const description = document.getElementById('r_description').value.trim();
+  
+  if (!institution || !date || !type || !subject || !description) {
+    alert('⚠️ يرجى ملء الحقول الإلزامية (*)'); return;
+  }
+  
+  const report = {
+    id: uid(),
+    institution: institution,
+    sender: document.getElementById('r_sender').value,
+    date: date,
+    time: document.getElementById('r_time').value,
+    type: type,
+    priority: document.getElementById('r_priority').value,
+    subject: subject,
+    description: description,
+    people: document.getElementById('r_people').value,
+    results: document.getElementById('r_results').value,
+    actions: document.getElementById('r_actions').value,
+    request: document.getElementById('r_request').value,
+    notes: document.getElementById('r_notes').value,
+    receivedAt: new Date().toISOString(),
+    status: 'جديد'
+  };
+  
+  DB.reports.push(report);
+  save();
+  
+  const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'تبليغ_' + institution + '_' + date + '.json';
+  a.click();
+  
+  alert('✅ تم حفظ التبليغ وتصديره كملف JSON!');
+  clearForm();
+}
+
+function clearForm() {
+  ['r_institution', 'r_sender', 'r_date', 'r_time', 'r_subject', 'r_description', 'r_people', 'r_results', 'r_actions', 'r_request', 'r_notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('r_type').value = '';
+  document.getElementById('r_priority').value = 'عادي';
+  document.getElementById('previewArea').innerHTML = '';
+}
+
+function previewReport() {
+  const type = document.getElementById('r_type').value;
+  const subject = document.getElementById('r_subject').value;
+  const description = document.getElementById('r_description').value;
+  const institution = document.getElementById('r_institution').value;
+  const date = document.getElementById('r_date').value;
+  if (!type || !subject) { alert('املأ نوع الواقعة والموضوع أولاً'); return; }
+  document.getElementById('previewArea').innerHTML = '<div class="official-doc"><div class="doc-header"><h3>معاينة التبليغ</h3></div><div class="doc-section"><p><b>المؤسسة:</b> ' + (institution || '-') + '</p><p><b>التاريخ:</b> ' + (date || '-') + '</p><p><b>نوع الواقعة:</b> ' + type + '</p><p><b>الموضوع:</b> ' + subject + '</p><p><b>الوصف:</b><br>' + (description || '-') + '</p></div></div>';
+}
+
+// ===== استيراد تبليغ =====
+function importReport(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.id && data.institution) {
+        if (DB.reports.find(r => r.id === data.id)) { alert('⚠️ هذا التبليغ موجود مسبقاً!'); return; }
+        DB.reports.push(data); save(); renderInspectorDashboard();
+        alert('✅ تم استيراد التبليغ من: ' + data.institution);
+      } else { alert('❌ ملف غير صالح'); }
+    } catch(err) { alert('❌ خطأ: ' + err.message); }
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+// ===== لوحة المفتش =====
+function renderInspectorDashboard() {
+  const total = DB.reports.length;
+  const today = new Date().toISOString().split('T')[0];
+  const todayCount = DB.reports.filter(r => r.date === today).length;
+  
+  const negativeTypes = ['طلب مساعدة', 'توقف/احتجاج', 'عنف', 'تخريب', 'تمرد', 'قوة قاهرة'];
+  const interventionCount = DB.reports.filter(r => negativeTypes.includes(r.type)).length;
+  
+  const invitationTypes = ['دعوة', 'دعوة محاضرة', 'دعوة حفل', 'زيارة تفتيش'];
+  const invitationCount = DB.reports.filter(r => invitationTypes.includes(r.type)).length;
+  
+  document.getElementById('stats').innerHTML = 
+    '<div style="background:#0a3d62;color:#fff;padding:20px;border-radius:8px;text-align:center;"><h3 style="font-size:32px;">' + total + '</h3><p>إجمالي التبليغات</p></div>' +
+    '<div style="background:#28a745;color:#fff;padding:20px;border-radius:8px;text-align:center;"><h3 style="font-size:32px;">' + todayCount + '</h3><p>اليوم</p></div>' +
+    '<div style="background:#dc3545;color:#fff;padding:20px;border-radius:8px;text-align:center;"><h3 style="font-size:32px;">' + interventionCount + '</h3><p>طلبات التدخل (سلبيات)</p></div>' +
+    '<div style="background:#17a2b8;color:#fff;padding:20px;border-radius:8px;text-align:center;"><h3 style="font-size:32px;">' + invitationCount + '</h3><p>الدعوات والإيجابيات</p></div>';
+  
+  const recent = [...DB.reports].sort((a,b) => (b.receivedAt||'').localeCompare(a.receivedAt||'')).slice(0, 5);
+  document.getElementById('recentReports').innerHTML = recent.length === 0 ? '<div class="alert">لا توجد تبليغات بعد</div>' : recent.map(r => '<div class="alert ' + (r.priority === 'ضروري' ? 'urgent' : '') + '"><b>' + r.institution + '</b> - ' + r.type + '<br><small>' + r.subject + ' | ' + r.date + '</small></div>').join('');
+  
+  renderAllReports();
+}
+
+function renderAllReports() {
+  const tbody = document.querySelector('#allReportsTable tbody');
+  const sorted = [...DB.reports].sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  tbody.innerHTML = sorted.map((r, idx) => '<tr><td>' + (idx + 1) + '</td><td>' + (r.date || '-') + '</td><td><b>' + (r.institution || '-') + '</b></td><td><span class="badge ' + getBadgeClass(r.type) + '">' + (r.type || '-') + '</span></td><td>' + (r.subject || '-') + '</td><td>' + (r.priority || '-') + '</td><td class="no-print"><button class="btn btn-info" onclick="viewReport(\'' + r.id + '\')">👁️</button> <button class="btn btn-danger" onclick="delReport(\'' + r.id + '\')">🗑️</button></td></tr>').join('');
+}
+
+function getBadgeClass(type) {
+  const map = { 'طلب مساعدة': 'help', 'توقف/احتجاج': 'stop', 'عنف': 'violence', 'تخريب': 'destruction', 'تمرد': 'rebellion', 'قوة قاهرة': 'force', 'دعوة': 'positive', 'دعوة محاضرة': 'positive', 'دعوة حفل': 'positive', 'زيارة تفتيش': 'visit', 'أخرى': 'other' };
+  return map[type] || 'other';
+}
+
+function viewReport(id) {
+  const r = DB.reports.find(x => x.id === id); if (!r) return;
+  alert('📋 تبليغ من: ' + r.institution + '\n📅 التاريخ: ' + r.date + '\n📂 نوع الواقعة: ' + r.type + '\n📌 الموضوع: ' + r.subject + '\n\n📝 الوصف:\n' + r.description + '\n\n👥 المعنيون: ' + (r.people || '-') + '\n🔧 الإجراءات: ' + (r.actions || '-') + '\n🎯 الطلب: ' + (r.request || '-'));
+}
+
+function delReport(id) {
+  if (!confirm('حذف هذا التبليغ؟')) return;
+  DB.reports = DB.reports.filter(r => r.id !== id); save(); renderInspectorDashboard();
+}
+
+function filterReports() {
+  const search = document.getElementById('searchReports').value.toLowerCase();
+  const type = document.getElementById('filterType').value;
+  const rows = document.querySelectorAll('#allReportsTable tbody tr');
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    const matchSearch = text.includes(search);
+    const matchType = !type || text.includes(type.toLowerCase());
+    row.style.display = (matchSearch && matchType) ? '' : 'none';
+  });
+}
+
+// ===== التقرير اليومي =====
+function generateDailyReport() {
+  const date = document.getElementById('daily_date').value; if (!date) return;
+  document.getElementById('daily_date_display').textContent = date;
+  document.getElementById('daily_footer_date').textContent = date;
+  
+  const reports = DB.reports.filter(r => r.date === date);
+  const total = reports.length;
+  const negativeTypes = ['طلب مساعدة', 'توقف/احتجاج', 'عنف', 'تخريب', 'تمرد', 'قوة قاهرة'];
+  const urgent = reports.filter(r => negativeTypes.includes(r.type)).length;
+  const invitationTypes = ['دعوة', 'دعوة محاضرة', 'دعوة حفل', 'زيارة تفتيش'];
+  const positive = reports.filter(r => invitationTypes.includes(r.type)).length;
+  
+  document.getElementById('daily_total').textContent = total;
+  document.getElementById('daily_urgent').textContent = urgent;
+  document.getElementById('daily_positive').textContent = positive;
+  
+  const tbody = document.getElementById('daily_table_body');
+  tbody.innerHTML = reports.map((r, idx) => '<tr><td>' + (idx + 1) + '</td><td>' + (r.institution || '-') + '</td><td>' + (r.type || '-') + '</td><td>' + (r.subject || '-') + '</td><td>' + (r.priority || '-') + '</td></tr>').join('') || '<tr><td colspan="5" style="text-align:center;">لا توجد تبليغات في هذا التاريخ</td></tr>';
+}
+
+// ===== التقرير الأسبوعي =====
+function generateWeeklyReport() {
+  const from = document.getElementById('weekly_from').value;
+  const to = document.getElementById('weekly_to').value;
+  if (!from || !to) return;
+  document.getElementById('weekly_from_display').textContent = from;
+  document.getElementById('weekly_to_display').textContent = to;
+  document.getElementById('weekly_footer_date').textContent = new Date().toLocaleDateString('ar-EG');
+  
+  const reports = DB.reports.filter(r => r.date >= from && r.date <= to);
+  const total = reports.length;
+  document.getElementById('weekly_total').textContent = total;
+  
+  const typeCount = {};
+  reports.forEach(r => { typeCount[r.type] = (typeCount[r.type] || 0) + 1; });
+  document.getElementById('weekly_type_body').innerHTML = Object.entries(typeCount).map(([t, c]) => '<tr><td>' + t + '</td><td>' + c + '</td><td>' + (total > 0 ? Math.round(c/total*100) : 0) + '%</td></tr>').join('') || '<tr><td colspan="3" style="text-align:center;">لا توجد بيانات</td></tr>';
+  
+  const instCount = {};
+  reports.forEach(r => { 
+    if (!instCount[r.institution]) instCount[r.institution] = { count: 0, topics: [] };
+    instCount[r.institution].count++;
+    if (!instCount[r.institution].topics.includes(r.subject)) instCount[r.institution].topics.push(r.subject);
+  });
+  document.getElementById('weekly_inst_body').innerHTML = Object.entries(instCount).map(([inst, data]) => '<tr><td>' + inst + '</td><td>' + data.count + '</td><td>' + data.topics.slice(0, 2).join('، ') + '</td></tr>').join('') || '<tr><td colspan="3" style="text-align:center;">لا توجد بيانات</td></tr>';
+  
+  const urgent = reports.filter(r => r.priority === 'ضروري' || r.priority === 'مستعجل');
+  document.getElementById('weekly_urgent_list').innerHTML = urgent.length === 0 ? '<p>لا توجد تبليغات عاجلة</p>' : urgent.map(r => '<p>🔴 <b>' + r.institution + '</b> - ' + r.subject + ' (' + r.date + ')</p>').join('');
+  
+  document.getElementById('weekly_analysis').textContent = total === 0 ? 'لا توجد تبليغات في هذه الفترة' : 'تم تسجيل ' + total + ' تبليغاً، منها ' + urgent.length + ' بدرجة تدخل مستعجلة أو ضرورية.';
+}
+
+// ===== التقرير الشهري =====
+function generateMonthlyReport() {
+  const month = document.getElementById('monthly_month').value; if (!month) return;
+  document.getElementById('monthly_month_display').textContent = month;
+  document.getElementById('monthly_footer_date').textContent = new Date().toLocaleDateString('ar-EG');
+  
+  const reports = DB.reports.filter(r => r.date && r.date.startsWith(month));
+  const total = reports.length;
+  const daysInMonth = new Date(month.split('-')[0], month.split('-')[1], 0).getDate();
+  const avg = total > 0 ? (total / daysInMonth).toFixed(1) : 0;
+  
+  document.getElementById('monthly_total').textContent = total;
+  document.getElementById('monthly_avg').textContent = avg;
+  
+  const typeCount = {};
+  reports.forEach(r => { typeCount[r.type] = (typeCount[r.type] || 0) + 1; });
+  document.getElementById('monthly_type_body').innerHTML = Object.entries(typeCount).map(([t, c]) => '<tr><td>' + t + '</td><td>' + c + '</td><td>' + (total > 0 ? Math.round(c/total*100) : 0) + '%</td></tr>').join('') || '<tr><td colspan="3" style="text-align:center;">لا توجد بيانات</td></tr>';
+  
+  // ✅ تفاصيل التبليغات في التقرير الشهري
+  const detailsTbody = document.getElementById('monthly_details_body');
+  detailsTbody.innerHTML = reports.map((r, idx) => '<tr><td>' + (idx + 1) + '</td><td>' + (r.date || '-') + '</td><td>' + (r.institution || '-') + '</td><td>' + (r.type || '-') + '</td><td>' + (r.subject || '-') + '</td><td>' + (r.priority || '-') + '</td></tr>').join('') || '<tr><td colspan="6" style="text-align:center;">لا توجد تبليغات هذا الشهر</td></tr>';
+
+  const instCount = {};
+  reports.forEach(r => { 
+    if (!instCount[r.institution]) instCount[r.institution] = { count: 0, types: [] };
+    instCount[r.institution].count++;
+    if (!instCount[r.institution].types.includes(r.type)) instCount[r.institution].types.push(r.type);
+  });
+  document.getElementById('monthly_inst_body').innerHTML = Object.entries(instCount).sort((a,b) => b[1].count - a[1].count).map(([inst, data]) => '<tr><td>' + inst + '</td><td>' + data.count + '</td><td>' + data.types.join('، ') + '</td></tr>').join('') || '<tr><td colspan="3" style="text-align:center;">لا توجد بيانات</td></tr>';
+  
+  const urgentCount = reports.filter(r => r.priority === 'ضروري' || r.priority === 'مستعجل').length;
+  document.getElementById('monthly_patterns').textContent = total === 0 ? 'لا توجد تبليغات' : 'شهد الشهر ' + total + ' تبليغاً بمتوسط ' + avg + ' يومياً، منها ' + urgentCount + ' بدرجة تدخل عالية.';
+  document.getElementById('monthly_recommendations').textContent = total === 0 ? '-' : 'متابعة المؤسسات ذات التبليغات المتكررة، وتعزيز التواصل الوقائي.';
+}
+
+// ===== التقرير السنوي =====
+function generateAnnualReport() {
+  const year = document.getElementById('annual_year').value;
+  document.getElementById('annual_year_display').textContent = year;
+  document.getElementById('annual_footer_date').textContent = new Date().toLocaleDateString('ar-EG');
+  
+  const reports = DB.reports.filter(r => r.date && r.date.startsWith(year));
+  const total = reports.length;
+  const avg = total > 0 ? (total / 12).toFixed(1) : 0;
+  
+  document.getElementById('annual_total').textContent = total;
+  document.getElementById('annual_avg').textContent = avg;
+  
+  const typeCount = {};
+  reports.forEach(r => { typeCount[r.type] = (typeCount[r.type] || 0) + 1; });
+  document.getElementById('annual_type_body').innerHTML = Object.entries(typeCount).map(([t, c]) => '<tr><td>' + t + '</td><td>' + c + '</td><td>' + (total > 0 ? Math.round(c/total*100) : 0) + '%</td></tr>').join('') || '<tr><td colspan="3" style="text-align:center;">لا توجد بيانات</td></tr>';
+  
+  const urgentReports = reports.filter(r => r.priority === 'ضروري' || r.priority === 'مستعجل');
+  document.getElementById('annual_urgent_body').innerHTML = urgentReports.map(r => '<tr><td>' + (r.date || '-') + '</td><td>' + (r.institution || '-') + '</td><td>' + (r.type || '-') + '</td><td>' + (r.subject || '-') + '</td></tr>').join('') || '<tr><td colspan="4" style="text-align:center;">لا توجد تبليغات عاجلة هذه السنة</td></tr>';
+  
+  document.getElementById('annual_analysis').textContent = total === 0 ? 'لا توجد تبليغات مسجلة لهذه السنة.' : 'تم تسجيل ' + total + ' تبليغاً خلال السنة. يوصى بمراجعة المؤسسات التي تتكرر فيها البلاغات واتخاذ إجراءات وقائية.';
+}
+
+// ===== الأرشيف =====
+function renderArchive() {
+  const total = DB.reports.length;
+  const types = {};
+  DB.reports.forEach(r => { types[r.type] = (types[r.type] || 0) + 1; });
+  const institutions = new Set(DB.reports.map(r => r.institution)).size;
+  
+  document.getElementById('archiveStats').innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px;"><div style="background:#0a3d62;color:#fff;padding:20px;border-radius:8px;text-align:center;"><h3 style="font-size:32px;">' + total + '</h3><p>إجمالي التبليغات</p></div><div style="background:#28a745;color:#fff;padding:20px;border-radius:8px;text-align:center;"><h3 style="font-size:32px;">' + institutions + '</h3><p>مؤسسة مشاركة</p></div><div style="background:#ffc107;color:#000;padding:20px;border-radius:8px;text-align:center;"><h3 style="font-size:32px;">' + Object.keys(types).length + '</h3><p>نوع تبليغ</p></div></div>';
+}
+
+function exportAllReports() {
+  const blob = new Blob([JSON.stringify(DB.reports, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'أرشيف_التبليغات_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+
+function importArchive(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (Array.isArray(data)) {
+        let count = 0;
+        data.forEach(r => {
+          if (r.id && !DB.reports.find(x => x.id === r.id)) { DB.reports.push(r); count++; }
+        });
+        save(); alert('✅ تم استيراد ' + count + ' تبليغ!'); renderArchive();
+      }
+    } catch(err) { alert('❌ ملف غير صالح'); }
+  };
+  reader.readAsText(file);
+}
+
+function clearArchive() {
+  if (!confirm('⚠️ هل أنت متأكد من مسح كل الأرشيف؟')) return;
+  if (!confirm('⚠️ تأكيد نهائي! لا يمكن التراجع.')) return;
+  DB.reports = []; save(); renderArchive(); alert('✅ تم مسح الأرشيف');
+}
+
+function printReport(docId) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('print-target'));
+  document.getElementById(docId).closest('.panel').classList.add('print-target');
+  setTimeout(() => window.print(), 100);
+}
+
+// ===== التهيئة =====
+if (DB.currentMode === 'institution') { showTabDirect('report'); } 
+else { renderInspectorDashboard(); }
+</script>
+</body>
+</html>
+
